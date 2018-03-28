@@ -38,12 +38,13 @@ def train():
     probNotSpam = 1 - probSpam
     
 
-# Function to set conditional pr
+# Function to set conditional probability parameters
 def processEmail(body, label):
 
-    for word in body:
+    for word in body.split(" "):
 
         if (label == "Spam"):
+
             global trainPositive
             trainPositive[word] = trainPositive.get(word, 0) + 1
 
@@ -61,15 +62,22 @@ def processEmail(body, label):
 def conditionalWord(word, label):
 
     if (label == "Spam"):
-        return trainPositive[word]/totalPositive
-    return trainNegative[word]/totalNegative
+        try:
+            return trainPositive[word]/totalPositive
+        except KeyError:
+            return 1.0
+
+    try:
+        return trainNegative[word]/totalNegative
+    except KeyError:
+        return 1.0
 
 
 #Function to get conditional probability of an email
 def conditionalEmail(body, label):
 
     result = 1.0
-    for word in body:
+    for word in body.split(" "):
         result *= conditionalWord(word, label)
     return result
 
@@ -89,10 +97,22 @@ train()
 
 # main function
 def main():
-    emailBody = cleanString(str(input("Enter the email body: ")))
+    emailBody = str(input("Enter the email body: "))
+    emailBody = cleanString(emailBody)
     answer_label = classifyEmail(emailBody)
 
-    print ("Email is: %s" % answer_label)
+def calculateAccuracy():
 
-if (__name__ == "__main__"):
-    main()  
+    total = 0
+    
+    for i in range(2, 926):
+
+        emailBody = cleanString(str(dataSheetOld.cell(row = i, column = 1).value))
+        answer_label = classifyEmail(emailBody)
+
+        if (answer_label == str(dataSheetOld.cell(row = i, column = 2).value)):
+            total += 1
+
+    print("Accuracy is: " + str(total/9.24))
+
+calculateAccuracy()
