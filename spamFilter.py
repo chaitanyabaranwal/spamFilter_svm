@@ -5,7 +5,7 @@ from cleanText import cleanString
 workBookOld = openpyxl.load_workbook('DataSet.xlsx')
 dataSheetOld = workBookOld.get_sheet_by_name('Data set')
 
-#initializing the required variables
+# initializing the required variables
 trainPositive = {}
 trainNegative = {}
 totalPositive = 0.0
@@ -13,26 +13,36 @@ totalNegative = 0.0
 probSpam = 0.0
 probNotSpam = 0.0
 
-# Function to train from the dataset
-def train():
+# Function to store data
+def store():
+
+    xData = []
+    yData = []
 
     rows = dataSheetOld.max_row
-    total = 0.0
-    numSpam = 0.0
 
     for i in range(2, rows+1):
 
-        label = str(dataSheetOld.cell(row = i, column = 2).value)
-        body = cleanString(str(dataSheetOld.cell(row = i, column = 1).value))
+        xData.append(cleanString(str(dataSheetOld.cell(row = i+2, column = 1).value)))
+        yData.append(str(dataSheetOld.cell(row = i+2, column = 2).value))
 
-        if (label == "Spam"):
+    return xData, yData
+
+
+# Function to train from the dataset
+def train(xData, yData):
+
+    numSpam = 0.0
+
+    for i in range(len(xData)):
+
+        if (yData[i] == "Spam"):
             numSpam += 1
 
-        processEmail(body, label)
-        total += 1
+        processEmail(xData[i], yData[i])
 
     global probSpam
-    probSpam = numSpam/total
+    probSpam = (float)(numSpam/len(xData))
 
     global probNotSpam
     probNotSpam = 1 - probSpam
@@ -41,7 +51,7 @@ def train():
 # Function to set conditional probability parameters
 def processEmail(body, label):
 
-    for word in body.split(" "):
+    for word in body:
 
         if (label == "Spam"):
 
@@ -62,22 +72,22 @@ def processEmail(body, label):
 def conditionalWord(word, label):
 
     if (label == "Spam"):
-        try:
+        if (word in trainPositive.keys()):
             return trainPositive[word]/totalPositive
-        except KeyError:
+        else:
             return 1.0
 
-    try:
-        return trainNegative[word]/totalNegative
-    except KeyError:
-        return 1.0
-
+    if (label == "Not Spam"):
+        if (word in trainNegative.keys()):
+            return trainNegative[word]/totalNegative
+        else:
+            return 1.0
 
 #Function to get conditional probability of an email
 def conditionalEmail(body, label):
 
     result = 1.0
-    for word in body.split(" "):
+    for word in body:
         result *= conditionalWord(word, label)
     return result
 
@@ -93,7 +103,8 @@ def classifyEmail(body):
         return "Not Spam"
 
 # train from the data set
-train()
+xData, yData = store()
+train(xData, yData)
 
 # main function
 def main():

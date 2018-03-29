@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import re
 import nltk
 
+string = """<div class="post-text" itemprop="text">\r\n<p>You can use:<br></p><p>import os.path</p><p>os.path.isfile(fname)<br></p>\r\n\r\n\r\n\r\n<p>if you need to be sure it's a file.</p>\r\n    </div>"""
+
 def cleanString(myString):
 
     # convert all html tags to 'htmltag' and all hyperlinks to 'linktag'
@@ -9,7 +11,7 @@ def cleanString(myString):
     myString = soup.get_text()
     numberHtml = len(soup.find_all())
     numberLink = len(soup.find_all('a'))
-    myString = myString + numberLink * " linktag " + numberHtml * " htmltag "
+    myString = myString + numberLink * " linktag "
 
     # convert text to lowercase
     myString = myString.lower()
@@ -21,7 +23,7 @@ def cleanString(myString):
     myString = re.sub(r'\b[^\s]+@[^\s]+[.][^\s]+\b', r' emailaddr ', myString)
 
     # convert numbers to 'number'
-    myString = re.sub(r'\b[\d.]+\b', r' number ', myString)
+    myString = re.sub(r'\b[\d]+\b', r' number ', myString)
 
     # convert $, ! and ? to proper words
     myString = re.sub(r'[$]', r' dollar ', myString)
@@ -47,3 +49,5 @@ def cleanString(myString):
     myString = ' '.join(stemWords)
 
     return myString
+
+print(cleanString(string))
