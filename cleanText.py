@@ -11,7 +11,7 @@ def cleanString(myString):
     myString = soup.get_text()
     numberHtml = len(soup.find_all())
     numberLink = len(soup.find_all('a'))
-    myString = myString + numberLink * " linktag "
+    myString = myString + numberLink * " linktag " + numberHtml * " htmltag "
 
     # convert text to lowercase
     myString = myString.lower()
@@ -20,10 +20,10 @@ def cleanString(myString):
     myString = re.sub(r'(http|https)://[^\s]*', r' httpaddr ', myString)
 
     # convert email addresses to 'emailaddr'
-    myString = re.sub(r'\b[^\s]+@[^\s]+[.][^\s]+\b', r' emailaddr ', myString)
+    myString = re.sub(r'[^\s]+@[^\s]+[.][^\s]+', r' emailaddr ', myString)
 
     # convert numbers to 'number'
-    myString = re.sub(r'\b[\d]+\b', r' number ', myString)
+    myString = re.sub(r'[0-9]+', r' number ', myString)
 
     # convert $, ! and ? to proper words
     myString = re.sub(r'[$]', r' dollar ', myString)
@@ -47,6 +47,8 @@ def cleanString(myString):
     stemmer = nltk.stem.snowball.SnowballStemmer('english')
     stemWords = [stemmer.stem(word) for word in keepWords]
     myString = ' '.join(stemWords)
+
+    myString = re.sub(r'[^a-z]+', r'', myString)
 
     return myString
 

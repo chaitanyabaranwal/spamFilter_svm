@@ -72,16 +72,10 @@ def processEmail(body, label):
 def conditionalWord(word, label):
 
     if (label == "Spam"):
-        if (word in trainPositive.keys()):
-            return trainPositive[word]/totalPositive
-        else:
-            return 1.0
+        return trainPositive[word]/totalPositive 
 
     if (label == "Not Spam"):
-        if (word in trainNegative.keys()):
-            return trainNegative[word]/totalNegative
-        else:
-            return 1.0
+        return trainNegative[word]/totalNegative
 
 #Function to get conditional probability of an email
 def conditionalEmail(body, label):
@@ -111,6 +105,7 @@ def main():
     emailBody = str(input("Enter the email body: "))
     emailBody = cleanString(emailBody)
     answer_label = classifyEmail(emailBody)
+    print(answer_label)
 
 def calculateAccuracy():
 
