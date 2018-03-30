@@ -1,20 +1,16 @@
 import openpyxl
+import numpy as np
 from cleanText import cleanString
+from collections import Counter
+from sklearn.naive_bayes import MultinomialNB, GaussianNB, BernoulliNB
+from sklearn.svm import SVC, NuSVC, LinearSVC
+from sklearn.metrics import confusion_matrix
 
 # Get the original dataset
-workBookOld = openpyxl.load_workbook('DataSet.xlsx')
-dataSheetOld = workBookOld.get_sheet_by_name('Data set')
-
-# initializing the required variables
-trainPositive = {}
-trainNegative = {}
-totalPositive = 0.0
-totalNegative = 0.0
-probSpam = 0.0
-probNotSpam = 0.0
-
-# Function to store data
 def store():
+
+    workBookOld = openpyxl.load_workbook('DataSet.xlsx')
+    dataSheetOld = workBookOld.get_sheet_by_name('Data set')
 
     xData = []
     yData = []
@@ -28,97 +24,59 @@ def store():
 
     return xData, yData
 
+# make a dictionary of the 3000 most common words
+def makeDictionary(xData):
 
-# Function to train from the dataset
-def train(xData, yData):
-
-    numSpam = 0.0
-
-    for i in range(len(xData)):
-
-        if (yData[i] == "Spam"):
-            numSpam += 1
-
-        processEmail(xData[i], yData[i])
-
-    global probSpam
-    probSpam = (float)(numSpam/len(xData))
-
-    global probNotSpam
-    probNotSpam = 1 - probSpam
+    emails = [mail for mail in xData]
+    all_words = []
     
+    for mail in emails:
 
-# Function to set conditional probability parameters
-def processEmail(body, label):
+        words = mail.split()
+        all_words += words
+    
+    dictionary = Counter(all_words)
+    dictionary = dictionary.most_common(100)
+    return dictionary
 
-    for word in body:
+# construct a 3000-column feature vector for each mail
+def extractFeatures(xData, dictionary):
+    
+    featureMatrix = np.zeros((len(xData), 100))
+    emailId = 0
 
-        if (label == "Spam"):
+    for mail in xData:
+        for word in mail:
+            wordId = 0
+            for i,d in enumerate(dictionary):
+                if (d[0] == word):
+                    wordId = i
+                    featureMatrix[emailId, wordId] = mail.count(word)
+        emailId += 1
 
-            global trainPositive
-            trainPositive[word] = trainPositive.get(word, 0) + 1
+    return featureMatrix
 
-            global totalPositive
-            totalPositive += 1
-
-        else:
-            global trainNegative
-            trainNegative[word] = trainNegative.get(word, 0) + 1
-
-            global totalNegative
-            totalNegative += 1
-
-#Function to get conditional probability of a word
-def conditionalWord(word, label):
-
-    if (label == "Spam"):
-        return trainPositive[word]/totalPositive 
-
-    if (label == "Not Spam"):
-        return trainNegative[word]/totalNegative
-
-#Function to get conditional probability of an email
-def conditionalEmail(body, label):
-
-    result = 1.0
-    for word in body:
-        result *= conditionalWord(word, label)
-    return result
-
-#Function to finally classify email
-def classifyEmail(body):
-
-    isSpam = probSpam * conditionalEmail(body, "Spam")
-    isNotSpam = probNotSpam * conditionalEmail(body, "Not Spam")
-
-    if (isSpam > isNotSpam):
-        return "Spam"
-    else:
-        return "Not Spam"
-
-# train from the data set
+# Create training data
 xData, yData = store()
-train(xData, yData)
+dictionary = makeDictionary(xData)
 
-# main function
-def main():
-    emailBody = str(input("Enter the email body: "))
-    emailBody = cleanString(emailBody)
-    answer_label = classifyEmail(emailBody)
-    print(answer_label)
+# Create feature vector and matrix for yData and xData
 
-def calculateAccuracy():
+yTrainMatrix = np.zeros(len(yData))
+for i in range(len(yData)):
+    if (yData[i] == "Spam"):
+        yTrainMatrix[i] = 1
 
-    total = 0
-    
-    for i in range(2, 926):
+xTrainMatrix = extractFeatures(xData, makeDictionary(xData))
 
-        emailBody = cleanString(str(dataSheetOld.cell(row = i, column = 1).value))
-        answer_label = classifyEmail(emailBody)
+# Training SVM and NB classifier
+model1 = MultinomialNB()
+model2 = LinearSVC()
+model1.fit(xTrainMatrix, yTrainMatrix)
+model2.fit(xTrainMatrix, yTrainMatrix)
 
-        if (answer_label == str(dataSheetOld.cell(row = i, column = 2).value)):
-            total += 1
-
-    print("Accuracy is: " + str(total/9.24))
-
-calculateAccuracy()
+# Test new data for Spam
+result1 = model1.predict(xTrainMatrix)
+result2 = model2.predict(xTrainMatrix)
+print(confusion_matrix(result1, yTrainMatrix))
+print(confusion_matrix(result2, yTrainMatrix))
