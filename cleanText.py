@@ -2,16 +2,13 @@ from bs4 import BeautifulSoup
 import re
 import nltk
 
-string = """<div class="post-text" itemprop="text">\r\n<p>You can use:<br></p><p>import os.path</p><p>os.path.isfile(fname)<br></p>\r\n\r\n\r\n\r\n<p>if you need to be sure it's a file.</p>\r\n    </div>"""
-
 def cleanString(myString):
 
     # convert all html tags to 'htmltag' and all hyperlinks to 'linktag'
     soup = BeautifulSoup(myString, 'html.parser')
     myString = soup.get_text()
-    numberHtml = len(soup.find_all())
     numberLink = len(soup.find_all('a'))
-    myString = myString + numberLink * " linktag " + numberHtml * " htmltag "
+    myString = myString + numberLink * " linktag "
 
     # convert text to lowercase
     myString = myString.lower()
@@ -48,8 +45,4 @@ def cleanString(myString):
     stemWords = [stemmer.stem(word) for word in keepWords]
     myString = ' '.join(stemWords)
 
-    myString = re.sub(r'[^a-z]+', r'', myString)
-
     return myString
-
-print(cleanString(string))

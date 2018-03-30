@@ -19,30 +19,30 @@ def store():
 
     for i in range(2, rows+1):
 
-        xData.append(cleanString(str(dataSheetOld.cell(row = i+2, column = 1).value)))
-        yData.append(str(dataSheetOld.cell(row = i+2, column = 2).value))
+        if (str(dataSheetOld.cell(row = i+2, column = 2).value) != 'None'):
+            xData.append(cleanString(str(dataSheetOld.cell(row = i+2, column = 1).value)))
+            yData.append(str(dataSheetOld.cell(row = i+2, column = 2).value))
 
     return xData, yData
 
 # make a dictionary of the 3000 most common words
 def makeDictionary(xData):
 
-    emails = [mail for mail in xData]
     all_words = []
     
-    for mail in emails:
+    for mail in xData:
 
         words = mail.split()
-        all_words += words
+        all_words.extend(words)
     
     dictionary = Counter(all_words)
-    dictionary = dictionary.most_common(100)
+    dictionary = dictionary.most_common(3000)
     return dictionary
 
 # construct a 3000-column feature vector for each mail
 def extractFeatures(xData, dictionary):
     
-    featureMatrix = np.zeros((len(xData), 100))
+    featureMatrix = np.zeros((len(xData), 3000))
     emailId = 0
 
     for mail in xData:
