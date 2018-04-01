@@ -36,13 +36,13 @@ def cleanString(myString):
     myString = re.sub(r'\s+', r' ', myString)
     myString = myString.strip(' ')
 
-    # remove all useless stopwords
+    return myString
+
+"""     # remove all useless stopwords
     myStringWords = myString.split(' ')
     keepWords = [word for word in myStringWords if word not in nltk.corpus.stopwords.words('english')]
 
     # perform word stemming
     stemmer = nltk.stem.snowball.SnowballStemmer('english')
     stemWords = [stemmer.stem(word) for word in keepWords]
-    myString = ' '.join(stemWords)
-
-    return myString
+    myString = ' '.join(stemWords) """

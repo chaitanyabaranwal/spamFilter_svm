@@ -2,9 +2,9 @@ import openpyxl
 import numpy as np
 from cleanText import cleanString
 from collections import Counter
-from sklearn.naive_bayes import MultinomialNB, GaussianNB, BernoulliNB
 from sklearn.svm import SVC, NuSVC, LinearSVC
 from sklearn.metrics import confusion_matrix
+from sklearn.cross_validation import train_test_split
 
 # Get the original dataset
 def store():
@@ -23,7 +23,9 @@ def store():
             xData.append(cleanString(str(dataSheetOld.cell(row = i+2, column = 1).value)))
             yData.append(str(dataSheetOld.cell(row = i+2, column = 2).value))
 
-    return xData, yData
+    xTrain, xTest, yTrain, yTest = train_test_split(xData, yData, test_size = 0.2)
+
+    return xTrain, xTest, yTrain, yTest
 
 # make a dictionary of the 3000 most common words
 def makeDictionary(xData):
@@ -36,13 +38,13 @@ def makeDictionary(xData):
         all_words.extend(words)
     
     dictionary = Counter(all_words)
-    dictionary = dictionary.most_common(3000)
+    dictionary = dictionary.most_common(10000)
     return dictionary
 
 # construct a 3000-column feature vector for each mail
 def extractFeatures(xData, dictionary):
     
-    featureMatrix = np.zeros((len(xData), 3000))
+    featureMatrix = np.zeros((len(xData), 10000))
     emailId = 0
 
     for mail in xData:
@@ -57,26 +59,33 @@ def extractFeatures(xData, dictionary):
     return featureMatrix
 
 # Create training data
-xData, yData = store()
-dictionary = makeDictionary(xData)
+xTrain, xTest, yTrain, yTest = store()
+trainDictionary = makeDictionary(xTrain)
+testDictionary = makeDictionary(xTest)
 
 # Create feature vector and matrix for yData and xData
 
-yTrainMatrix = np.zeros(len(yData))
-for i in range(len(yData)):
-    if (yData[i] == "Spam"):
+yTrainMatrix = np.zeros(len(yTrain))
+for i in range(len(yTrain)):
+    if (yTrain[i] == "Spam"):
         yTrainMatrix[i] = 1
 
-xTrainMatrix = extractFeatures(xData, makeDictionary(xData))
+yTestMatrix = np.zeros(len(yTest))
 
-# Training SVM and NB classifier
-model1 = MultinomialNB()
-model2 = LinearSVC()
-model1.fit(xTrainMatrix, yTrainMatrix)
-model2.fit(xTrainMatrix, yTrainMatrix)
+total = 0 # to check the number of spam with predicted
+for i in range(len(yTest)):
+    if (yTest[i] == "Spam"):
+        yTestMatrix[i] = 1
+        total += 1
+
+xTrainMatrix = extractFeatures(xTrain, trainDictionary)
+xTestMatrix = extractFeatures(xTest, testDictionary)
+
+# Training SVM classifier
+model = LinearSVC(C = 0.5, random_state = 200, class_weight = 'balanced')
+model.fit(xTrainMatrix, yTrainMatrix)
 
 # Test new data for Spam
-result1 = model1.predict(xTrainMatrix)
-result2 = model2.predict(xTrainMatrix)
-print(confusion_matrix(result1, yTrainMatrix))
-print(confusion_matrix(result2, yTrainMatrix))
+result = model.predict(xTestMatrix)
+print(confusion_matrix(result, yTestMatrix))
+print(total)
