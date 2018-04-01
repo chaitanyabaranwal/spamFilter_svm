@@ -27,7 +27,7 @@ def store():
 
     return xTrain, xTest, yTrain, yTest
 
-# make a dictionary of the 3000 most common words
+# make a dictionary of the most common words
 def makeDictionary(xData):
 
     all_words = []
@@ -41,7 +41,7 @@ def makeDictionary(xData):
     dictionary = dictionary.most_common(10000)
     return dictionary
 
-# construct a 3000-column feature vector for each mail
+# construct a feature vector for each mail
 def extractFeatures(xData, dictionary):
     
     featureMatrix = np.zeros((len(xData), 10000))
