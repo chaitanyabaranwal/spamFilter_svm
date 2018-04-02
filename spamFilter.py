@@ -21,9 +21,12 @@ def store():
 
         if (str(dataSheetOld.cell(row = i+2, column = 2).value) != 'None'):
             xData.append(cleanString(str(dataSheetOld.cell(row = i+2, column = 1).value)))
-            yData.append(str(dataSheetOld.cell(row = i+2, column = 2).value))
+            if (str(dataSheetOld.cell(row = i+2, column = 2).value) == "Spam"):
+                yData.append(1)
+            else:
+                yData.append(0)
 
-    xTrain, xTest, yTrain, yTest = train_test_split(xData, yData, test_size = 0.2)
+    xTrain, xTest, yTrain, yTest = train_test_split(xData, yData, test_size = 0.2, random_state = 42)
 
     return xTrain, xTest, yTrain, yTest
 
@@ -38,13 +41,13 @@ def makeDictionary(xData):
         all_words.extend(words)
     
     dictionary = Counter(all_words)
-    dictionary = dictionary.most_common(10000)
+    dictionary = dictionary.most_common(3000)
     return dictionary
 
 # construct a feature vector for each mail
 def extractFeatures(xData, dictionary):
     
-    featureMatrix = np.zeros((len(xData), 10000))
+    featureMatrix = np.zeros((len(xData), 3000))
     emailId = 0
 
     for mail in xData:
@@ -63,29 +66,38 @@ xTrain, xTest, yTrain, yTest = store()
 trainDictionary = makeDictionary(xTrain)
 testDictionary = makeDictionary(xTest)
 
-# Create feature vector and matrix for yData and xData
-
+# Create feature vector and matrix for yTrain and xTrain
 yTrainMatrix = np.zeros(len(yTrain))
 for i in range(len(yTrain)):
-    if (yTrain[i] == "Spam"):
+    if (yTrain[i] == 1):
         yTrainMatrix[i] = 1
 
 yTestMatrix = np.zeros(len(yTest))
-
-total = 0 # to check the number of spam with predicted
+total = 0
 for i in range(len(yTest)):
-    if (yTest[i] == "Spam"):
+    if (yTest[i] == 1):
         yTestMatrix[i] = 1
         total += 1
 
 xTrainMatrix = extractFeatures(xTrain, trainDictionary)
-xTestMatrix = extractFeatures(xTest, testDictionary)
+xTestMatrix = extractFeatures(xTest, trainDictionary)
 
 # Training SVM classifier
-model = LinearSVC(C = 0.5, random_state = 200, class_weight = 'balanced')
+model = LinearSVC(class_weight='balanced')
 model.fit(xTrainMatrix, yTrainMatrix)
 
 # Test new data for Spam
 result = model.predict(xTestMatrix)
-print(confusion_matrix(result, yTestMatrix))
-print(total)
+matrix = confusion_matrix(result, yTestMatrix)
+
+# Calculating the F-score
+def calcFScore(matrix):
+
+    precision = float(matrix[0][0])/(matrix[0][0] + matrix[0][1])
+    recall = float(matrix[0][0])/(matrix[0][0] + matrix[1][0])
+
+    fScore = (2 * precision * recall)/(precision + recall)
+    return fScore
+
+print(matrix)
+print(calcFScore(matrix))
