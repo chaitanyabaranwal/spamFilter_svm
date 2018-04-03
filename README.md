@@ -33,7 +33,7 @@ If one wants to test the learning algorithm, simply add the following lines to t
 fScore, matrix = calcFScore(xTest, yTest)
 print("F-score is: %s" % fScore)
 ```
-As you'll see, **the learning algorithm gives an F-score of ~0.92**
+As you'll see, **the learning algorithm gives an F-score of ~0.94**. The F-score is calculated taking non-spam labels (0) as positive and spam labels (1) as negative.
 
 
 ### Applying the algorithm to predict future emails
