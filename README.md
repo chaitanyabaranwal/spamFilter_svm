@@ -16,9 +16,43 @@ Clone to repository to your computer, navigate to the cloned repo and run the pr
   * cleanText.py : `BeautifulSoup`, `re` and `nltk`
   * spamFilter.py : `openpyxl`, `numpy`, `scipy`, `sklearn` and `collections`
   
+  
 To install any library on your system, you can use the `pip` or `pip3` command
 ```
 pip3 install sklearn
 pip3 install BeautifulSoup
 ```
 Linux users may have to use `sudo` command with `pip` if libraries are being installed directly in the system.
+
+### Test cases used
+
+The code by itself randomly splits the given dataset into an 80-20 ratio for training and testing respectively. 
+If one wants to test the learning algorithm, simply add the following lines to the end of the code:
+```
+fScore, matrix = calcFScore(xTest, yTest)
+print("F-score is: %s" % fScore)
+```
+As you'll see, **the learning algorithm gives an F-score of ~0.92**
+
+### Applying the algorithm to predict future emails
+
+Since it's better to train on the entire dataset for classifying future emails, the following modifications to the code will ensure that the entire dataset is trained upon and future e-mails can be classified based on their body content:
+
+* Modify `store()` to return the entire dataset
+```
+def store():
+...
+# NOTE: ...
+return xData, yData
+```
+
+* Replace line 67 to `xTrain, yTrain = store()`
+* To classify an email, store email content in `emailBody`, and add the following lines to the end of the code:
+```
+label = predict(emailBody)
+print("Email is: %s" % label)
+```
+
+## Authors
+
+* **Chaitanya Baranwal** (https://github.com/chaitanyabaranwal/)
