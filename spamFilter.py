@@ -27,7 +27,7 @@ def store():
             else:
                 yData.append(0)
 
-    xTrain, xTest, yTrain, yTest = train_test_split(xData, yData, test_size = 0.2, random_state = 1)
+    xTrain, xTest, yTrain, yTest = train_test_split(xData, yData, test_size = 0.2, random_state = 42)
 
     return xTrain, xTest, yTrain, yTest
 
