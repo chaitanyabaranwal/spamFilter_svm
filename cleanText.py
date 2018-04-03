@@ -4,12 +4,6 @@ import nltk
 
 def cleanString(myString):
 
-    # convert all html tags to 'htmltag' and all hyperlinks to 'linktag'
-    soup = BeautifulSoup(myString, 'html.parser')
-    myString = soup.get_text()
-    numberLink = len(soup.find_all('a'))
-    myString = myString + numberLink * " linktag "
-
     # convert text to lowercase
     myString = myString.lower()
 
@@ -18,6 +12,13 @@ def cleanString(myString):
 
     # convert email addresses to 'emailaddr'
     myString = re.sub(r'[^\s]+@[^\s]+[.][^\s]+', r' emailaddr ', myString)
+    
+    # convert all html tags to 'htmltag' and all hyperlinks to 'linktag'
+    soup = BeautifulSoup(myString, 'html.parser')
+    myString = soup.get_text()
+    numberLink = len(soup.find_all('a'))
+    numberHtml = len(soup.find_all()) - numberLink
+    myString = myString + numberLink * " linktag " + numberHtml * " htmltag "
 
     # convert numbers to 'number'
     myString = re.sub(r'[0-9]+', r' number ', myString)

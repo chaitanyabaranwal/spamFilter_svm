@@ -10,7 +10,7 @@ from sklearn.cross_validation import train_test_split
 def store():
 
     workBookOld = openpyxl.load_workbook('DataSet.xlsx')
-    dataSheetOld = workBookOld.get_sheet_by_name('Data set')
+    dataSheetOld = workBookOld['Data set']
 
     xData = []
     yData = []
@@ -26,7 +26,7 @@ def store():
             else:
                 yData.append(0)
 
-    xTrain, xTest, yTrain, yTest = train_test_split(xData, yData, test_size = 0.2, random_state = 42)
+    xTrain, xTest, yTrain, yTest = train_test_split(xData, yData, test_size = 0.2, random_state = 1)
 
     return xTrain, xTest, yTrain, yTest
 
@@ -83,7 +83,7 @@ xTrainMatrix = extractFeatures(xTrain, trainDictionary)
 xTestMatrix = extractFeatures(xTest, trainDictionary)
 
 # Training SVM classifier
-model = LinearSVC(class_weight='balanced')
+model = NuSVC(nu = 0.01)
 model.fit(xTrainMatrix, yTrainMatrix)
 
 # Test new data for Spam
