@@ -3,6 +3,7 @@ import numpy as np
 from cleanText import cleanString
 from collections import Counter
 from sklearn.svm import SVC, NuSVC, LinearSVC
+from sklearn.naive_bayes import MultinomialNB, GaussianNB, BernoulliNB
 from sklearn.metrics import confusion_matrix
 from sklearn.cross_validation import train_test_split
 
@@ -73,17 +74,15 @@ for i in range(len(yTrain)):
         yTrainMatrix[i] = 1
 
 yTestMatrix = np.zeros(len(yTest))
-total = 0
 for i in range(len(yTest)):
     if (yTest[i] == 1):
         yTestMatrix[i] = 1
-        total += 1
 
 xTrainMatrix = extractFeatures(xTrain, trainDictionary)
 xTestMatrix = extractFeatures(xTest, trainDictionary)
 
 # Training SVM classifier
-model = NuSVC(nu = 0.01)
+model = NuSVC(nu = 0.01, class_weight = 'balanced')
 model.fit(xTrainMatrix, yTrainMatrix)
 
 # Test new data for Spam
