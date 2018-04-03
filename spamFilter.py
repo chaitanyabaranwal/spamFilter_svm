@@ -65,7 +65,6 @@ def extractFeatures(xData, dictionary):
 # Create training data
 xTrain, xTest, yTrain, yTest = store()
 trainDictionary = makeDictionary(xTrain)
-testDictionary = makeDictionary(xTest)
 
 # Create feature vector and matrix for yTrain and xTrain
 yTrainMatrix = np.zeros(len(yTrain))
@@ -73,30 +72,37 @@ for i in range(len(yTrain)):
     if (yTrain[i] == 1):
         yTrainMatrix[i] = 1
 
-yTestMatrix = np.zeros(len(yTest))
-for i in range(len(yTest)):
-    if (yTest[i] == 1):
-        yTestMatrix[i] = 1
-
 xTrainMatrix = extractFeatures(xTrain, trainDictionary)
-xTestMatrix = extractFeatures(xTest, trainDictionary)
 
 # Training SVM classifier
 model = NuSVC(nu = 0.01, class_weight = 'balanced')
 model.fit(xTrainMatrix, yTrainMatrix)
 
-# Test new data for Spam
-result = model.predict(xTestMatrix)
-matrix = confusion_matrix(result, yTestMatrix)
-
 # Calculating the F-score
-def calcFScore(matrix):
+def calcFScore(xTest, yTest):
+
+    xTestMatrix = extractFeatures(xTest, trainDictionary)
+    yTestMatrix = np.zeros(len(yTest))
+    for i in range(len(yTest)):
+        if (yTest[i] == 1):
+            yTestMatrix[i] = 1
+
+    result = model.predict(xTestMatrix)
+    matrix = confusion_matrix(result, yTestMatrix)
 
     precision = float(matrix[0][0])/(matrix[0][0] + matrix[0][1])
     recall = float(matrix[0][0])/(matrix[0][0] + matrix[1][0])
 
     fScore = (2 * precision * recall)/(precision + recall)
-    return fScore
+    return fScore, matrix
 
-print(matrix)
-print(calcFScore(matrix))
+# Test new data for Spam
+def predict(emailBody):
+
+    featureMatrix = extractFeatures([emailBody], trainDictionary)
+    result = model.predict(featureMatrix)
+
+    if (1 in result):
+        return "Spam"
+    else:
+        return "Not Spam"
