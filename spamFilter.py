@@ -27,8 +27,9 @@ def store():
             else:
                 yData.append(0)
 
+    # NOTE: to train data on the entire dataset, simply return xData and yData
+    # Splitting the data like this is to obtain test cases and calculate the F-score of the learning algorithm
     xTrain, xTest, yTrain, yTest = train_test_split(xData, yData, test_size = 0.2, random_state = 42)
-
     return xTrain, xTest, yTrain, yTest
 
 # make a dictionary of the most common words
