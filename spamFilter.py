@@ -4,7 +4,7 @@ from cleanText import cleanString
 from collections import Counter
 from sklearn.svm import SVC, NuSVC, LinearSVC
 from sklearn.naive_bayes import MultinomialNB, GaussianNB, BernoulliNB
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, f1_score
 from sklearn.cross_validation import train_test_split
 
 # Get the original dataset
@@ -76,7 +76,7 @@ for i in range(len(yTrain)):
 xTrainMatrix = extractFeatures(xTrain, trainDictionary)
 
 # Training SVM classifier
-model = NuSVC(nu = 0.01, class_weight = 'balanced')
+model = NuSVC(nu = 0.05, class_weight = 'balanced')
 model.fit(xTrainMatrix, yTrainMatrix)
 
 # Calculating the F-score
@@ -89,12 +89,9 @@ def calcFScore(xTest, yTest):
             yTestMatrix[i] = 1
 
     result = model.predict(xTestMatrix)
-    matrix = confusion_matrix(result, yTestMatrix)
+    matrix = confusion_matrix(yTestMatrix, result)
 
-    precision = float(matrix[0][0])/(matrix[0][0] + matrix[0][1])
-    recall = float(matrix[0][0])/(matrix[0][0] + matrix[1][0])
-
-    fScore = (2 * precision * recall)/(precision + recall)
+    fScore = f1_score(yTestMatrix, result, pos_label = 0)
     return fScore, matrix
 
 # Test new data for Spam
@@ -107,3 +104,6 @@ def predict(emailBody):
         return "Spam"
     else:
         return "Not Spam"
+
+fScore, matrix = calcFScore(xTest, yTest)
+print(fScore, matrix)
