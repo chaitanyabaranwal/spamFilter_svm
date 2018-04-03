@@ -14,7 +14,8 @@ Clone to repository to your computer, navigate to the cloned repo and run the pr
   
 * **Libraries required to be installed to run the code**
   * cleanText.py : `BeautifulSoup`, `re` and `nltk`
-  * spamFilter.py : `openpyxl`, `numpy`, `scipy`, `sklearn` and `collections`
+  * spamFilter.py : `openpyxl`, `numpy`, `scipy`, `sklearn` and `collections`.
+  * `openpyxl` is required to read the `.xlsx` dataset file. If you have data stored in another format/file, make sure you have the necessary library installed, and modify the code in `store()` to store the training data in `xData` and `yData`.
   
   
 To install any library on your system, you can use the `pip` or `pip3` command
@@ -33,6 +34,7 @@ fScore, matrix = calcFScore(xTest, yTest)
 print("F-score is: %s" % fScore)
 ```
 As you'll see, **the learning algorithm gives an F-score of ~0.92**
+
 
 ### Applying the algorithm to predict future emails
 
