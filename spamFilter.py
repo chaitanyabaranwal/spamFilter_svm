@@ -97,7 +97,7 @@ def calcFScore(xTest, yTest):
 # Test new data for Spam
 def predict(emailBody):
 
-    featureMatrix = extractFeatures([emailBody], trainDictionary)
+    featureMatrix = extractFeatures([cleanString(emailBody)], trainDictionary)
     result = model.predict(featureMatrix)
 
     if (1 in result):
