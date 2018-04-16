@@ -2,8 +2,7 @@ import openpyxl
 import numpy as np
 from cleanText import cleanString
 from collections import Counter
-from sklearn.svm import SVC, NuSVC, LinearSVC
-from sklearn.naive_bayes import MultinomialNB, GaussianNB, BernoulliNB
+from sklearn.svm import NuSVC
 from sklearn.metrics import confusion_matrix, f1_score
 from sklearn.cross_validation import train_test_split
 
