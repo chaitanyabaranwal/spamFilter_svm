@@ -13,11 +13,10 @@ def cleanString(myString):
     # convert email addresses to 'emailaddr'
     myString = re.sub(r'[^\s]+@[^\s]+[.][^\s]+', r' emailaddr ', myString)
     
-    # convert all html tags to 'htmltag' and all hyperlinks to 'linktag'
+    # convert all hyperlinks to 'linktag'
     soup = BeautifulSoup(myString, 'html.parser')
     myString = soup.get_text()
     numberLink = len(soup.find_all('a'))
-    numberHtml = len(soup.find_all()) - numberLink
     myString = myString + numberLink * " linktag "
 
     # convert numbers to 'number'
