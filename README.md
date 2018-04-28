@@ -1,6 +1,6 @@
 # SVM Spam Filter
 
-A Python SVM-based Spam Filter which trains on a dataset using the `NuSVM` model and uses the model to predict whether future emails are spam or non-spam.
+A Python SVM-based Spam Filter which trains on a dataset using the `NuSVC` model and uses the model to predict whether future emails are spam or non-spam.
 
 ## Getting started
 
