@@ -17,8 +17,7 @@ def cleanString(myString):
     soup = BeautifulSoup(myString, 'html.parser')
     myString = soup.get_text()
     numberLink = len(soup.find_all('a'))
-    numberHtml = len(soup.find_all()) - numberLink
-    myString = myString + numberLink * " linktag " + numberHtml * " htmltag "
+    myString = myString + numberLink * " linktag "
 
     # convert numbers to 'number'
     myString = re.sub(r'[0-9]+', r' number ', myString)
