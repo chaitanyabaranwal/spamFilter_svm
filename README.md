@@ -1,6 +1,6 @@
 # SVM Spam Filter
 
-A Python SVM-based Spam Filter which trains on a dataset using the `NuSVC` model and uses the model to predict whether future emails are spam or non-spam.
+A Python SVM-based Spam Filter which trains on a dataset using the `LinearSVC` model and `TfidfVectorizer` to predict whether future emails are spam or non-spam. A `TfidfVectorizer` makes handling of imbalanced data more efficient by removing common words and giving more weight to words being used in spam-emails.
 
 ## Getting started
 
@@ -14,7 +14,7 @@ Clone to repository to your computer, navigate to the cloned repo and run the pr
   
 * **Libraries required to be installed to run the code**
   * cleanText.py : `BeautifulSoup`, `re` and `nltk`
-  * spamFilter.py : `openpyxl`, `numpy`, `scipy`, `sklearn` and `collections`.
+  * spamFilter.py : `openpyxl`, `numpy`, `scipy`, and `sklearn`
   * `openpyxl` is required to read the `.xlsx` dataset file. If you have data stored in another format/file, make sure you have the necessary library installed, and modify the code in `store()` to store the training data in `xData` and `yData`.
   
   
@@ -30,10 +30,10 @@ Linux users may have to use `sudo` command with `pip` if libraries are being ins
 The code by itself randomly splits the given dataset into an 80-20 ratio for training and testing respectively. 
 If one wants to test the learning algorithm, simply add the following lines to the end of the code:
 ```
-fScore, matrix = calcFScore(xTest, yTest)
+fScore, matrix = calcFScore(xTest, yTest, model, vectorizer)
 print("F-score is: %s" % fScore)
 ```
-As you'll see, **the learning algorithm gives an F-score of ~0.94**. The F-score is calculated taking non-spam labels (0) as positive and spam labels (1) as negative.
+As you'll see, **the learning algorithm gives an F-score, precision and recall of ~0.97**. The F-score is calculated taking non-spam labels (0) as positive and spam labels (1) as negative.
 
 
 ### Applying the algorithm to predict future emails
@@ -51,7 +51,7 @@ return xData, yData
 * Replace line 67 to `xTrain, yTrain = store()`
 * To classify an email, store email content in `emailBody`, and add the following lines to the end of the code:
 ```
-label = predict(emailBody)
+label = predict(emailBody, model, vectorizer)
 print("Email is: %s" % label)
 ```
 
