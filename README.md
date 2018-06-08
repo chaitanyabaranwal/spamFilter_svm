@@ -55,6 +55,17 @@ label = predict(emailBody, model, vectorizer)
 print("Email is: %s" % label)
 ```
 
+## Additional Notes
+
+* For more information about the LinearSVC model, its parameters and other SVM models:      
+  * http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html
+  * http://scikit-learn.org/stable/modules/svm.html
+
+* For more information on TF-IDF vectorizer, its working and other feature extractors:
+  * http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
+  * http://scikit-learn.org/stable/modules/feature_extraction.html
+  * https://en.wikipedia.org/wiki/Tf%E2%80%93idf
+
 ## Authors
 
 * **Chaitanya Baranwal** (https://github.com/chaitanyabaranwal/)
