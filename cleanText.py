@@ -17,7 +17,8 @@ def cleanString(myString):
     soup = BeautifulSoup(myString, 'html.parser')
     myString = soup.get_text()
     numberLink = len(soup.find_all('a'))
-    myString = myString + numberLink * " linktag "
+    numberImg = len(soup.find_all('img'))
+    myString = myString + numberLink * " linktag " + numberImg * " imgtag "
 
     # convert numbers to 'number'
     myString = re.sub(r'[0-9]+', r' number ', myString)
@@ -36,13 +37,10 @@ def cleanString(myString):
     myString = re.sub(r'\s+', r' ', myString)
     myString = myString.strip(' ')
 
-    # remove all useless stopwords
-    myStringWords = myString.split(' ')
-    keepWords = [word for word in myStringWords if word not in nltk.corpus.stopwords.words('english')]
-
     # perform word stemming
+    myStringWords = myString.split(' ')
     stemmer = nltk.stem.snowball.SnowballStemmer('english')
-    stemWords = [stemmer.stem(word) for word in keepWords]
+    stemWords = [stemmer.stem(word) for word in myStringWords]
     myString = ' '.join(stemWords)
 
     return myString
